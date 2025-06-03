@@ -1,84 +1,40 @@
-require('dotenv').config()
-const { Sequelize, Model, DataTypes } = require('sequelize')
-
 const express = require('express')
 const app = express()
 
+const { PORT } = require('./util/config')
+const { connectToDatabase } = require('./util/db')
+
+const blogsRouter = require('./controllers/blogs')
+
 app.use(express.json())
 
-const sequelize = new Sequelize(process.env.DATABASE_URL)
+app.use('/api/blogs', blogsRouter)
 
-class Blog extends Model { }
+const unknownEndpoint = (req, res) => {
+  res.status(404).send({ error: 'unknown endpoint' })
+}
 
-Blog.init({
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true
-  },
-  author: {
-    type: DataTypes.STRING,
-  },
-  url: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  title: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  likes: {
-    type: DataTypes.INTEGER,
-    defaultValue: 0,
+app.use(unknownEndpoint)
+
+const errorHandler = (error, req, res, next) => {
+  console.error(`${error.name}: ${error.message}`)
+
+  if(error.name === 'SequelizeValidationError') {
+    return res.status(400).send({error: error.message})
+  } if (error.name === 'SequelizeDatabaseError') {
+    return res.status(400).send({error: error.message})
   }
-}, {
-  sequelize,
-  underscored: true,
-  timestamps: false,
-  modelName: 'blog'
-})
 
-Blog.sync()
+  next(error)
+}
 
-app.get('/api/blogs', async (req, res) => {
-  const blogs = await Blog.findAll()
-  console.log(JSON.stringify(blogs, null, 2))
-  res.json(blogs)
-})
+app.use(errorHandler)
 
-app.post('/api/blogs', async (req, res) => {
-  try {
-    console.log(req.body)
-    const blog = await Blog.create(req.body)
-    res.json(blog)
-  }
-  catch (error) {
-    res.status(400).json({ error })
-  }
-})
+const start = async () => {
+  await connectToDatabase()
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`)
+  })
+}
 
-app.delete('/api/blogs/:id', async (req, res) => {
-  const returnedCount = await Blog.destroy({ where: { id: req.params.id } })
-  if (returnedCount === 0) {
-    return res.status(404).end()
-  }
-  res.status(204).end()
-})
-
-const PORT = process.env.PORT || 3001
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`)
-})
-
-/* const main = async () => {
-  try {
-    await sequelize.authenticate()
-    console.log('Connection has been established successfully.')
-    sequelize.close()
-  } catch (error) {
-    console.error('Unable to connect to the database:', error)
-  }
-} */
-/* 
-main() */
-
+start()
