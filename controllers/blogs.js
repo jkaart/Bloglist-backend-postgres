@@ -64,7 +64,7 @@ router.get('/', async (req, res) => {
 })
 
 router.post('/', tokenExtractor, async (req, res) => {
-  console.log('body:', req.body)
+  //console.log('body:', req.body)
   const blog = await Blog.create({ ...req.body, userId: req.user.id })
   res.status(201).json(blog)
 })
