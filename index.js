@@ -8,6 +8,7 @@ const blogsRouter = require('./controllers/blogs')
 const usersRouter = require('./controllers/users')
 const loginRouter = require('./controllers/login')
 const authorsRouter = require('./controllers/authors')
+const { errorHandler } = require('./util/middleware')
 
 app.use(express.json())
 
@@ -21,20 +22,6 @@ const unknownEndpoint = (req, res) => {
 }
 
 app.use(unknownEndpoint)
-
-const errorHandler = (error, req, res, next) => {
-  console.error(`${error.name}: ${error.message}`)
-
-  if (error.name === 'SequelizeValidationError') {
-    return res.status(400).send({ error: error.message })
-  } if (error.name === 'SequelizeDatabaseError') {
-    return res.status(400).send({ error: error.message })
-  } if (error.name === 'JsonWebTokenError') {
-    return res.status(401).json({ error: 'token invalid' })
-  }
-
-  next(error)
-}
 
 app.use(errorHandler)
 
