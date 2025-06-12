@@ -18,6 +18,13 @@ router.get('/', async (req, res) => {
 })
 
 router.get('/:id', async (req, res) => {
+  const { read } = req.query
+  const where = {}
+
+  if (read !== undefined) {
+    where.read = read
+  }
+  
   const user = await User.findByPk(req.params.id, {
     include: [{
       model: Blog,
@@ -25,7 +32,8 @@ router.get('/:id', async (req, res) => {
       attributes: ['id', 'author', 'url', 'title', 'likes', 'year'],
       through: {
         as: 'readinglists',
-        attributes: ['id', 'read']
+        attributes: ['id', 'read'],
+        where
       },
     },
     ]
