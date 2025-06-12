@@ -8,7 +8,6 @@ router.get('/', async (req, res) => {
   let where = {}
 
   if (req.query.search) {
-    console.log(req.query.search)
     where = {
       [Op.or]: [
         {
@@ -34,14 +33,12 @@ router.get('/', async (req, res) => {
     where,
     order: [['likes', 'DESC']]
   })
-  //console.log(JSON.stringify(blogs, null, 2))
   res.json(blogs)
 })
 
 router.post('/', tokenExtractor, async (req, res) => {
-  //console.log('body:', req.body)
-
   const blog = await Blog.create({ ...req.body, userId: req.user.id })
+
   res.status(201).json(blog)
 })
 
@@ -49,6 +46,7 @@ router.delete('/:id', tokenExtractor, blogFinder, async (req, res) => {
   if (req.user.id !== req.blog.userId) {
     return res.status(401).send({ error: 'unauthorized user' })
   }
+
   await req.blog.destroy()
   res.status(204).end()
 })

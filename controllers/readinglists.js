@@ -6,7 +6,7 @@ const router = require('express').Router()
 router.post('/', async (req, res) => {
   const read = await ReadLists.create({ blogId: req.body.blog_id, userId: req.body.user_id })
 
-  res.json(read)
+  res.status(201).json(read)
 })
 
 router.put('/:id', tokenExtractor, async (req, res) => {

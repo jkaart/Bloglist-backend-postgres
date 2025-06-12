@@ -10,10 +10,10 @@ const errorHandler = (error, req, res, next) => {
   } if (error.name === 'SequelizeDatabaseError') {
     return res.status(400).send({ error: error.message })
   } if (error.name === 'SequelizeForeignKeyConstraintError') {
-    return res.status(400).send({error: error.message})
+    return res.status(400).send({ error: error.message })
   } if (error.name === 'JsonWebTokenError') {
     return res.status(401).json({ error: 'token invalid' })
-  }  
+  }
   next(error)
 }
 

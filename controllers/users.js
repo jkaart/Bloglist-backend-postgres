@@ -24,7 +24,7 @@ router.get('/:id', async (req, res) => {
   if (read !== undefined) {
     where.read = read
   }
-  
+
   const user = await User.findByPk(req.params.id, {
     include: [{
       model: Blog,
@@ -49,6 +49,7 @@ router.get('/:id', async (req, res) => {
 router.put('/:username', async (req, res) => {
   const { username } = req.params
   const user = await User.findOne({ where: { username } })
+  
   if (!user) {
     return res.status(404).json({ error: 'username not found' })
   }
