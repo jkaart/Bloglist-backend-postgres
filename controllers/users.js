@@ -1,6 +1,6 @@
 const router = require('express').Router()
 
-const { User, Blog, ReadLists } = require('../models')
+const { User, Blog } = require('../models')
 
 router.post('/', async (req, res) => {
   const user = await User.create(req.body)
@@ -49,7 +49,7 @@ router.get('/:id', async (req, res) => {
 router.put('/:username', async (req, res) => {
   const { username } = req.params
   const user = await User.findOne({ where: { username } })
-  
+
   if (!user) {
     return res.status(404).json({ error: 'username not found' })
   }
@@ -58,6 +58,5 @@ router.put('/:username', async (req, res) => {
   await user.save()
   res.json(user)
 })
-
 
 module.exports = router

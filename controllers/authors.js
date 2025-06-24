@@ -1,7 +1,7 @@
+const router = require('express').Router()
+
 const { fn, col } = require('sequelize')
 const { Blog } = require('../models')
-
-const router = require('express').Router()
 
 router.get('/', async (req, res) => {
   const authors = await Blog.findAll({

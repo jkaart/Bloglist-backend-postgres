@@ -1,7 +1,7 @@
+const router = require('express').Router()
+
 const { ReadLists } = require('../models')
 const { tokenExtractor } = require('../util/middleware')
-
-const router = require('express').Router()
 
 router.post('/', async (req, res) => {
   const read = await ReadLists.create({ blogId: req.body.blog_id, userId: req.body.user_id })
@@ -11,9 +11,11 @@ router.post('/', async (req, res) => {
 
 router.put('/:id', tokenExtractor, async (req, res) => {
   const readList = await ReadLists.findByPk(req.params.id)
-
+  if (!readList) {
+    return res.status(404).send({ error: 'readList not found' })
+  }
   if (!req.body?.read) {
-    return res.status(400).json({ error: 'read missing from body' })
+    return res.status(400).send({ error: 'read missing from body' })
   }
 
   if (req.user.id !== readList.userId) {
