@@ -13,6 +13,7 @@ router.post('/', async (req, res) => {
       username: username
     }
   })
+  
   const passwordCorrect = password === 'salainen'
 
   if (!(user && passwordCorrect)) {
@@ -22,7 +23,7 @@ router.post('/', async (req, res) => {
   }
 
   if (user.disabled) {
-    return res.status(401).json({ error: 'unauthorized user' })
+    return res.status(401).json({ error: 'disabled user' })
   }
 
   const userForToken = {
@@ -33,7 +34,7 @@ router.post('/', async (req, res) => {
 
   await Session.destroy({ where: { userId: user.id } })
 
-  const session = await Session.create({ userId: user.id, token })
+  await Session.create({ userId: user.id, token })
 
   res
     .status(200)
